@@ -1,0 +1,102 @@
+#creating a INDEX shards
+PUT /products
+{
+  "settings": {
+    "number_of_replicas": 2,
+    "number_of_shards": 2
+  }
+}
+
+#indexing an document (adding a document in INDEX)
+POST /products/_doc
+{
+  "name": "Coffee Maker",
+  "price": 65,
+  "in_stock": 10
+}
+
+#adding a doc with specific ID
+POST /products/_doc/100   
+{
+  "name": "Toaster",
+  "price": 49,
+  "in_stock": 4
+}
+
+#auto_create_index --> default true| just like ID
+#fetching the stored document
+GET /products/_doc/100
+
+#update the doc value
+POST /products/_update/100
+{
+  "doc": {
+    "in_stock":33
+  }
+}
+
+#check for updated value------------------
+GET /products/_doc/100
+
+#delete index
+DELETE /pages
+
+#update and add new tag
+POST /products/_update/100
+{
+  "doc": {
+    "tags": ["electronics"]
+  }
+}
+#ES documents are immutables | so we have not updated it was REPLACED
+
+#scripting updates |eg. updating in_stock
+#eg-1
+POST /products/_update/100
+{
+  "script": {
+    "source": "ctx._source.in_stock--"
+  }
+}
+#eg-2
+POST /products/_update/100
+{
+  "script": {
+    "source": "ctx._source.in_stock = 10"
+  }
+}
+#eg-3
+POST /products/_update/100
+{
+  "script": {
+    "source": "ctx._source.in_stock -= params.quantity",
+    "params": {
+      "quantity":4
+    }
+  }
+}
+#UPSERTING | update if already exists or new doc
+POST /products/_update/101
+{
+  "script": {
+    "source": "ctx._source.in_stock++"
+  },
+  "upsert": {
+    "name": "Blender",
+    "price": 399,
+    "in_stock": 5
+  }
+}
+#run upsert twice and in_stock increase by 1
+
+#REPLACING DOC
+PUT /products/_doc/100
+{
+  "name": "Toaster",
+  "price": 40,
+  "in_stack": 4
+}
+#DELETE document
+DELETE /products/_doc/101
+
+GET /products/_doc/101
