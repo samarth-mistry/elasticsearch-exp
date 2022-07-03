@@ -1,0 +1,15 @@
+#built-in std analyzer
+POST /_analyze
+{
+  "text": "2 man walk into   a bar, but the third......DUCKS! :-)",
+  "analyzer": "standard"
+}
+
+#create a custon anaylzer in three steps char_filter|tokenizer|filter(lwcase)
+POST /_analyze
+{
+  "text": "2 man walk into   a bar, but the third......DUCKS! :-)",
+  "char_filter": [],
+  "tokenizer": "standard",
+  "filter": ["lowercase"]
+}
