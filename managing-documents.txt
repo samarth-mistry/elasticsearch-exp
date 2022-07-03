@@ -100,3 +100,68 @@ PUT /products/_doc/100
 DELETE /products/_doc/101
 
 GET /products/_doc/101
+
+#optimistic concurrency control
+GET /products/_doc/100
+POST /products/_update/100?if_primary_term=1&if_seq_no=11
+{
+  "doc": {
+    "in_stock":123
+  }
+}
+
+POST /products/_update_by_query
+{
+  "script": {
+    "source": "",
+    "lang": "painless"
+  }
+}
+
+#update by query
+POST /products/_update_by_query
+{
+  "script": {
+    "source": "ctx._source.in_stock--",
+    "lang": "painless"
+  },
+  "query": {
+    "match_all": {}
+  }
+}
+
+#delete by query
+POST /products/_delete_by_query
+{
+  "query":{
+    "match_all":{}
+  }
+}
+
+#Batch processing
+POST /_bulk
+{ "index": { "_index":"products", "_id": 200 } }
+{ "name": "Espresso Mach", "price": 99, "in_stock": 5 }
+{ "create": {"_index": "products", "_id": 201 } }
+{ "name": "Milk Frother", "price": 149, "in_stock": 14 }
+
+#search query
+GET /products/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+#update bulk
+POST /_bulk
+{ "update": { "_index": "products", "_id": 201 } }
+{ "doc": { "price": 129 } }
+{ "delete": { "_index": "products", "_id": 200 } }
+
+#--------------OR----------------
+POST /products/_bulk
+{ "update": { "_id": 201 } }
+{ "doc": { "price": 129 } }
+{ "delete": { "_id": 200 } }
+
