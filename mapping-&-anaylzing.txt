@@ -13,3 +13,163 @@ POST /_analyze
   "tokenizer": "standard",
   "filter": ["lowercase"]
 }
+
+#keyword analyzer
+#use-case is in email storing
+
+POST /_analyze
+{
+  "text": "2 guys walk into    a bar, but the thord....",
+  "analyzer": "keyword"
+}
+
+#coercion
+PUT /coercion/_doc/1
+{
+  "price": 7.3
+}
+PUT /coercion/_doc/2
+{
+  "price": "7.4"
+  
+}
+PUT /coercion/_doc/3
+{
+  "price": "7.4n"
+  
+}
+GET /coercion/_doc/1
+DELETE /coercion
+
+#arrays | don't really exists
+POST /_analyze
+{
+  "text": ["Strings are simply","merged together"],
+  "analyzer": "standard"
+}
+
+#Explicit mappings
+PUT /reviews
+{
+  "mappings": {
+    "properties": {
+      "rating": { "type": "float"},
+      "content": { "type": "text"},
+      "product_id": { "type": "integer"},
+      "author": {
+        "properties": {
+          "first_name": { "type": "text"},
+          "last_name": { "type": "text" },
+          "email": { "type": "keyword" }
+        }
+      }
+    }
+  }
+}
+#INDEX a DOCUMENT INSIDE IT
+PUT /reviews/_doc/1
+{
+  "rating": 5.0,
+  "content": "Outstanding course! Mistry is really good at teaching.",
+  "product_id": 123,
+  "author": {
+    "first_name":"John",
+    "last_name":"CS",
+    "email":"john@anormali.io"
+  }
+}
+#retrieving mappings
+GET /reviews/_mapping
+GET /reviews/_mapping/field/content
+GET /reviews/_mapping/field/author.email
+
+#dot notataion in mapping |method 2 (shortcut)
+PUT /reviews_dot_notation
+{
+  "mappings": {
+    "properties": {
+      "rating": { "type": "float"},
+      "content": { "type": "text"},
+      "product_id": { "type": "integer"},
+      "author.first_name": { "type": "text"},
+      "author.last_name": { "type": "text"},
+      "author.email": { "type": "keyword"}
+    }
+  }
+}
+
+GET /reviews_dot_notation/_mapping
+
+#mappings for existing index
+PUT /reviews/_mapping
+{
+  "properties": {
+    "created_at": {
+      "type": "date"
+    }
+  }
+}
+GET /reviews/_mapping
+
+#Date datatype
+PUT /reviews/_doc/2
+{
+  "rating": 4.0,
+  "content": "Not bad.",
+  "product_id": 123,
+  "created_at": "2015-03-27",
+  "author": {
+    "first_name":"John",
+    "last_name":"CS",
+    "email":"john@anormali.io"
+  }
+}
+
+PUT /reviews/_doc/3
+{
+  "rating": 4.0,
+  "content": "Could be better",
+  "product_id": 123,
+  "created_at": "2015-04-15T13:07:41Z",
+  "author": {
+    "first_name":"John",
+    "last_name":"CS",
+    "email":"john@anormali.io"
+  }
+}
+
+PUT /reviews/_doc/4
+{
+  "rating": 4.0,
+  "content": "Could be better",
+  "product_id": 123,
+  "created_at": "2015-04-15T13:07:41+01:00",
+  "author": {
+    "first_name":"John",
+    "last_name":"CS",
+    "email":"john@anormali.io"
+  }
+}
+
+PUT /reviews/_doc/5
+{
+  "rating": 4.0,
+  "content": "Could be better",
+  "product_id": 123,
+  "created_at": 1436011284000,
+  "author": {
+    "first_name":"John",
+    "last_name":"CS",
+    "email":"john@anormali.io"
+  }
+}
+
+GET /reviews/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+#missing fields
+
