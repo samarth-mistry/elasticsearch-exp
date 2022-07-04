@@ -355,3 +355,49 @@ PUT /_template/access-logs
 
 PUT /access-logs-2020-01-01
 GET /access-logs-2020-01-01
+#dynamic mapping
+#ECS
+
+
+#dynamic mapping
+GET /products/_mapping
+#combine dynamic + explict
+PUT /people
+{
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "first_name": {
+        "type": "text"
+      }
+    }
+  }
+}
+
+POST /people/_doc
+{
+  "first_name": "Samarth",
+  "last_name": "Mistry"
+}
+
+GET /people/_mapping
+
+GET /people/_search
+{
+  "query": {
+    "match": {
+      "first_name": "Samarth"
+    }
+  }
+}
+GET /people/_search
+{
+  "query": {
+    "match": {
+      "last_name": "Mistry"
+    }
+  }
+}
+#conclusion ["Dyn":false] ignores index not rejects
+#clear
+DELETE /people
