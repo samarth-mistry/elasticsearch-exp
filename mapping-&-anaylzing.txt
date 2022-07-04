@@ -420,3 +420,212 @@ POST /people/_doc
   "first_name": "Samarth",
   "last_name": "Mistry"
 }
+#dynamic templete
+PUT /dynamic_template_test
+{
+  "mappings": {
+    "dynamic_templates": [
+      {
+        "integers": {
+          "match_mapping_type": "long",
+          "mapping": {
+            "type": "integer"
+          }
+        }
+      }
+    ]
+  }
+}
+
+POST /dynamic_template_test/_doc
+{
+  "in_stock": 123
+}
+
+GET /dynamic_template_test/_mapping
+
+#stemming | linguistic meaning
+
+#custom analyzer
+PUT /analyzer_test
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_custom_analyzer": {
+          "type": "custom",
+          "char_filter": ["html_strip"],
+          "tokenizer": "standard",
+          "filter":[
+            "lowercase",
+            "stop",
+            "asciifolding"
+          ]
+        }
+      }
+    }
+  }
+}
+
+PUT /analyzer_test_2
+{
+  "settings": {
+    "analysis": {
+      "filter": {
+        "danish_stop": {
+          "type": "stop",
+          "stopwords": "_danish_"
+        }
+      }, 
+      "analyzer": {
+        "my_custom_analyzer": {
+          "type": "custom",
+          "char_filter": ["html_strip"],
+          "tokenizer": "standard",
+          "filter":[
+            "lowercase",
+            "danish_stop",
+            "asciifolding"
+          ]
+        }
+      }
+    }
+  }
+}
+
+POST /_analyze
+{
+  "analyzer": "standard",
+  "text": "I&apos;m in a <em>good></em> mood&nbsp;-&nbsp;and I <strong>love</strong> aCAI!"
+}
+POST /_analyze
+{
+  "char_filter": ["html_strip"],
+  "text": "I&apos;m in a <em>good></em> mood&nbsp;-&nbsp;and I <strong>love</strong> aCAI!"
+}
+POST /analyzer_test/_analyze
+{
+  "analyzer": "my_custom_analyzer",
+  "text": "I&apos;m in a <em>good></em> mood&nbsp;-&nbsp;and I <strong>love</strong> aCAI!"
+}
+
+POST /analyzer_test_2/_analyze
+{
+  "analyzer": "my_custom_analyzer",
+  "text": "I&apos;m in a <em>good></em> mood&nbsp;-&nbsp;and I <strong>love</strong> aCAI!"
+}
+
+#add analyzer to existing index
+
+PUT /analyzer_test/_settings
+{
+  "analysis": {
+    "analyzer": {
+        "my_custom_analyzer_2": {
+          "type": "custom",
+          "char_filter": ["html_strip"],
+          "tokenizer": "standard",
+          "filter":[
+            "lowercase",
+            "stop",
+            "asciifolding"
+          ]
+        }
+      }
+  }
+}
+
+POST /analyzer_test/_close
+POST /analyzer_test/_open
+
+GET /analyzer_test/_settings
+
+#UPDATING a analyzer
+PUT /analyzer_test/_mapping
+{
+  "properties": {
+    "description": {
+      "type": "text",
+      "analyzer": "my_custom_analyzer"
+    }
+  }
+}
+
+#!!!!!!!RUN this after updation again!!!!!!!
+POST /analyzer_test/_doc
+{
+  "description": "Is that Peter's cute-looking dog?"
+}
+
+GET /analyzer_test/_search
+{
+  "query": {
+    "match": {
+      "description": {
+        "query": "that",
+        "analyzer": "keyword"
+      }
+    }
+  }
+}
+
+POST /analyzer_test/_close
+
+#remove stop filter and update
+PUT /analyzer_test/_settings
+{
+  "analysis": {
+    "analyzer": {
+        "my_custom_analyzer": {
+          "type": "custom",
+          "char_filter": ["html_strip"],
+          "tokenizer": "standard",
+          "filter":[
+            "lowercase",
+            "asciifolding"
+          ]
+        }
+      }
+  }
+}
+
+POST /analyzer_test/_open
+
+GET /analyzer_test/_settings
+
+#!!OLD doc doesnt have "that" while new one have, to overcume this
+
+#reindex all the documents
+POST /analyzer_test/_update_by_query?conflicts=proceed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
