@@ -172,4 +172,79 @@ GET /reviews/_search
 }
 
 #missing fields
+#REINDEXING and changing datatype of an field in MAPPING----->
+GET /reviews/_mapping
+#changin keyword to product_id
+PUT /review_new
+{
+  "mappings": {
+    "properties": {
+      "author": {
+        "properties": {
+          "email": {
+            "type": "keyword"
+          },
+          "first_name": {
+            "type": "text"
+          },
+          "last_name": {
+            "type": "text"
+          }
+        }
+      },
+      "content": {
+        "type": "text"
+      },
+      "created_at": {
+        "type": "date"
+      },
+      "product_id": {
+        "type": "keyword"
+      },
+      "rating": {
+        "type": "float"
+      }
+    }
+  }
+}
+#reindex API
+POST /_reindex
+{
+  "source": {
+    "index": "reviews"
+  },
+  "dest": {
+    "index": "review_new"
+  }
+}
+
+POST /_reindex
+{
+  "source": {
+    "index": "reviews"
+  },
+  "dest": {
+    "index": "review_new"
+  },
+  "script": {
+    "source": """
+      if(ctx._source.product_id != null){
+        ctx._source.product_id=ctx._source.product_id.toString();
+      }
+    """
+  }
+}
+GET /review_new/_mapping
+GET /review_new/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+POST /review_new/_delete_by_query
+{
+  "query": {
+    "match_all": {}
+  }
+}
 
