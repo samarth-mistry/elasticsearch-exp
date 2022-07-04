@@ -247,4 +247,111 @@ POST /review_new/_delete_by_query
     "match_all": {}
   }
 }
+#alternative to REINDEXING while renaming the field | ALIAS
 
+PUT /reviews/_mapping
+{
+  "properties": {
+    "comment": {
+      "type": "alias",
+      "path": "content"
+    }
+  }
+}
+#search original field
+GET /reviews/_search
+{
+  "query": {
+    "match_all": {
+      "content": "outstanding"
+    }
+  }
+}
+#search alias field
+GET /reviews/_search
+{
+  "query": {
+    "match_all": {
+      "comment": "outstanding"
+    }
+  }
+}
+
+PUT /multi_field_test
+{
+  "mappings": {
+    "properties": {
+      "description": {
+        "type": "text"
+      },
+      "ingredients": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        }
+      }
+    }
+  }
+}
+
+POST /multi_field_test/_doc
+{
+  "description": "To make this speaghetti carbonara, you first need to...",
+  "ingredients": ["Spaghetti","Bacon","Eggs"]
+}
+
+GET /multi_field_test/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+GET /multi_field_test/_search
+{
+  "query": {
+    "match": {
+      "ingredients": "Spaghetti"
+    }
+  }
+}
+
+#exact match
+GET /multi_field_test/_search
+{
+  "query": {
+    "term": {
+      "ingredients.keyword": "Spaghetti"
+    }
+  }
+}
+#index templete
+PUT /_template/access-logs
+{
+  "index_patterns": ["access-logs-*"],
+  "settings": {
+    "number_of_shards": 2,
+    "index.mapping.coerce": false
+  },
+  "mappings": {
+    "properties": {
+      "@timestamp": {
+        "type": "date"
+      },
+      "url.orignal": {
+        "type": "keyword"
+      },
+      "http.request.referrer": {
+        "type": "keyword"
+      },
+      "http.response.status_code": {
+        "type": "long"
+      }
+    }
+  }
+}
+
+PUT /access-logs-2020-01-01
+GET /access-logs-2020-01-01
