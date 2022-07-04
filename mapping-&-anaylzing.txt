@@ -401,3 +401,22 @@ GET /people/_search
 #conclusion ["Dyn":false] ignores index not rejects
 #clear
 DELETE /people
+
+#FOR REJECTION --> STRICT
+PUT /people
+{
+  "mappings": {
+    "dynamic": "strict",
+    "properties": {
+      "first_name": {
+        "type": "text"
+      }
+    }
+  }
+}
+
+POST /people/_doc
+{
+  "first_name": "Samarth",
+  "last_name": "Mistry"
+}
