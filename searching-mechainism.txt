@@ -19,3 +19,10 @@ GET /products/default/_search
     "match_all": {}
   }
 }
+
+#TF/IDF vs BM25
+#Non-linear term freq. saturation
+#advantages of BM25
+# *Better with stop words
+# * improves the fields-length norm factor
+# * can be configured with params
