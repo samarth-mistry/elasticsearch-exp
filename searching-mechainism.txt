@@ -1,0 +1,21 @@
+#SEARCHING-----DSL
+#type-1 - Query DSL (produ.)
+#type-2 - Request URL (debug)
+
+GET /products/default/_search?q=*
+GET /products/default/_search?q=name:Lobster
+GET /products/default/_search?q=tags:Meat AND name:Tuna
+#boolean logic
+
+#query DSL
+# + leaf query
+# + compound query
+#   + bool query
+#   + nested leaf query
+
+GET /products/default/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
