@@ -58,3 +58,39 @@ GET /orders/_search
     }
   }
 }
+      }
+    }
+  }
+}
+GET /orders/_search
+{
+  "size": 0,
+  "aggs": {
+    "status_terms": {
+      "terms": {
+        "field": "status",
+        "size": 20,
+        "missing": "N/A",
+        "min_doc_count": 0
+      }
+    }
+  }
+}
+
+GET /orders/_search
+{
+  "size": 0,
+  "aggs": {
+    "status_terms": {
+      "terms": {
+        "field": "status",
+        "size": 20,
+        "missing": "N/A",
+        "min_doc_count": 0,
+        "order": {
+          "_key": "asc"
+        }
+      }
+    }
+  }
+}
