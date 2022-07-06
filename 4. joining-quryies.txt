@@ -265,3 +265,33 @@ GET /department/_search
 }
 
 #NOTE: here ID is departmentID (parent) type is child object type
+
+#querying child doc by parent
+GET /department/_search
+{
+  "query": {
+    "has_parent": {
+      "parent_type": "department",
+      "query": {
+        "term": {
+          "name.keyword": "Development"
+        }
+      }
+    }
+  }
+}
+#releveve for term is used for child's relevence
+GET /department/_search
+{
+  "query": {
+    "has_parent": {
+      "parent_type": "department",
+      "score": true,
+      "query": {
+        "term": {
+          "name.keyword": "Development"
+        }
+      }
+    }
+  }
+}
