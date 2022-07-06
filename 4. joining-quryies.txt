@@ -353,3 +353,34 @@ GET /department/_search
     }
   }
 }
+GET /department/_search
+{
+  "query": {
+    "has_child": {
+      "type": "employee",
+      "score_mode": "sum",
+      "min_children": 2,
+      "max_children": 5,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "age": {
+                  "gte": 50
+                }
+              }
+            }
+          ],
+          "should": [
+            {
+              "term": {
+                "gender.keyword": "M"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
